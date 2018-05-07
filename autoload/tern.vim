@@ -8,7 +8,7 @@ let s:script = s:plug . '/script/tern.py'
 execute 'py3file ' . fnameescape(s:script)
 
 if !exists('g:tern#command')
-  let g:tern#command = ["node", expand('<sfile>:h') . '/../node_modules/tern/.bin/tern', '--no-port-file']
+  let g:tern#command = ["node", expand('<sfile>:h') . '/../node_modules/tern/bin/tern', '--no-port-file']
 endif
 
 if !exists('g:tern#arguments')
@@ -93,33 +93,10 @@ if !exists('g:tern_show_loc_after_refs')
   let g:tern_show_loc_after_refs = 1
 endif
 
-function! tern#DefaultKeyMap(...)
-  let prefix = len(a:000)==1 ? a:1 : "<LocalLeader>"
-  execute 'nnoremap <buffer> '.prefix.'tD' ':TernDoc<CR>'
-  execute 'nnoremap <buffer> '.prefix.'tb' ':TernDocBrowse<CR>'
-  execute 'nnoremap <buffer> '.prefix.'tt' ':TernType<CR>'
-  execute 'nnoremap <buffer> '.prefix.'td' ':TernDef<CR>'
-  execute 'nnoremap <buffer> '.prefix.'tpd' ':TernDefPreview<CR>'
-  execute 'nnoremap <buffer> '.prefix.'tsd' ':TernDefSplit<CR>'
-  execute 'nnoremap <buffer> '.prefix.'ttd' ':TernDefTab<CR>'
-  execute 'nnoremap <buffer> '.prefix.'tr' ':TernRefs<CR>'
-  execute 'nnoremap <buffer> '.prefix.'tR' ':TernRename<CR>'
-endfunction
-
 function! tern#Enable()
   if stridx(&buftype, "nofile") > -1 || stridx(&buftype, "nowrite") > -1
     return
   endif
-
-  command! -buffer TernDoc py3 tern_lookupDocumentation()
-  command! -buffer TernDocBrowse py3 tern_lookupDocumentation(browse=True)
-  command! -buffer TernType py3 tern_lookupType()
-  command! -buffer TernDef py3 tern_lookupDefinition("edit")
-  command! -buffer TernDefPreview py3 tern_lookupDefinition("pedit")
-  command! -buffer TernDefSplit py3 tern_lookupDefinition("split")
-  command! -buffer TernDefTab py3 tern_lookupDefinition("tabe")
-  command! -buffer TernRefs py3 tern_refs()
-  command! -buffer -nargs=? TernRename exe 'py3 tern_rename("'.(empty('<args>') ? input("new name? ",expand("<cword>")) : '<args>').'")'
 
   let b:ternProjectDir = ''
   let b:ternLastCompletion = []
@@ -130,9 +107,6 @@ function! tern#Enable()
   let b:ternInsertActive = 0
   if g:tern_set_omni_function
     setlocal omnifunc=tern#Complete
-  endif
-  if g:tern_map_keys
-    call tern#DefaultKeyMap(g:tern_map_prefix)
   endif
   augroup TernAutoCmd
     autocmd! * <buffer>
